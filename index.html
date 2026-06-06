@@ -19,6 +19,7 @@
     --c50:#2e7d32;   --c50bg:#e8f5e9;
     --c100:#1565c0;  --c100bg:#e3f2fd;
     --c200:#e58a00;  --c200bg:#fff4e2;
+    --c300:#6a3fb5;  --c300bg:#efe8fb;
     --c400:#c62828;  --c400bg:#fdecea;
     --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 18px rgba(0,0,0,.05);
     --radius:14px;
@@ -90,6 +91,7 @@
   .pg100 .proc{border-color:#bcd9f5;color:var(--c100)} .pg100 .proc .amt{color:var(--c100)}
   .pg200 .proc{border-color:#f5dcab;color:var(--c200)} .pg200 .proc .amt{color:var(--c200)}
   .pg400 .proc{border-color:#f3c2bd;color:var(--c400)} .pg400 .proc .amt{color:var(--c400)}
+  .pg300 .proc{border-color:#d6c6f0;color:var(--c300)} .pg300 .proc .amt{color:var(--c300)}
 
   /* log list */
   .daygroup{margin-bottom:14px}
@@ -108,6 +110,7 @@
   .entry .price{font-weight:800;font-size:15px;padding:2px 9px;border-radius:8px}
   .p50{color:var(--c50);background:var(--c50bg)} .p100{color:var(--c100);background:var(--c100bg)}
   .p200{color:var(--c200);background:var(--c200bg)} .p400{color:var(--c400);background:var(--c400bg)}
+  .p300{color:var(--c300);background:var(--c300bg)}
   .iconbtn{border:none;background:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 4px}
   .iconbtn:active{color:var(--c400)}
 
@@ -144,11 +147,12 @@
   .modal{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px 22px;max-height:92vh;overflow:auto;animation:up .2s ease}
   @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
   .modal h3{margin:0 0 14px;font-size:17px;color:var(--brand)}
-  .pricepick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .pricepick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .pricepick button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px 0;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .pricepick button.sel[data-p="50"]{border-color:var(--c50);background:var(--c50bg);color:var(--c50)}
   .pricepick button.sel[data-p="100"]{border-color:var(--c100);background:var(--c100bg);color:var(--c100)}
   .pricepick button.sel[data-p="200"]{border-color:var(--c200);background:var(--c200bg);color:var(--c200)}
+  .pricepick button.sel[data-p="300"]{border-color:var(--c300);background:var(--c300bg);color:var(--c300)}
   .pricepick button.sel[data-p="400"]{border-color:var(--c400);background:var(--c400bg);color:var(--c400)}
 
   .filterbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -190,6 +194,25 @@
   <div class="wrap">
 
     <section class="card">
+      <h2>แพทย์ผู้ปฏิบัติงาน</h2>
+      <div class="body">
+        <div class="row">
+          <select id="docSel" onchange="onDocSel()"></select>
+        </div>
+        <div class="grid2" id="docCustomWrap" style="display:none">
+          <div>
+            <div class="label">ชื่อแพทย์</div>
+            <input id="docName" placeholder="เช่น นพ.สมชาย ใจดี" autocomplete="off">
+          </div>
+          <div>
+            <div class="label">เลข ว.</div>
+            <input id="docLic" placeholder="เลขใบประกอบฯ" autocomplete="off" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>ผู้ป่วยปัจจุบัน <button class="btn ghost sm" onclick="clearPatient()">ผู้ป่วยใหม่</button></h2>
       <div class="body">
         <div class="row">
@@ -205,6 +228,10 @@
             <div class="label">Ward</div>
             <input id="pWard" placeholder="หอผู้ป่วย" autocomplete="off">
           </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="label">วินิจฉัยโรค</div>
+          <input id="pDx" placeholder="การวินิจฉัย / Dx" autocomplete="off">
         </div>
       </div>
     </section>
@@ -307,6 +334,18 @@
       <div><div class="label">Ward</div><input id="mWard"></div>
     </div>
     <div class="row" style="margin-top:10px">
+      <div class="label">วินิจฉัยโรค</div>
+      <input id="mDx" placeholder="การวินิจฉัย / Dx">
+    </div>
+    <div class="row">
+      <div class="label">แพทย์ผู้ทำ</div>
+      <select id="mDocSel" onchange="onMDocSel()"></select>
+    </div>
+    <div class="grid2" id="mDocCustomWrap" style="display:none">
+      <div><div class="label">ชื่อแพทย์</div><input id="mDocName" placeholder="ชื่อแพทย์"></div>
+      <div><div class="label">เลข ว.</div><input id="mDocLic" inputmode="numeric"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
       <div class="label">หัตถการ</div>
       <select id="mProcSel" onchange="onProcSel()"></select>
     </div>
@@ -320,6 +359,7 @@
         <button data-p="50" onclick="pickPrice(50)">50</button>
         <button data-p="100" onclick="pickPrice(100)">100</button>
         <button data-p="200" onclick="pickPrice(200)">200</button>
+        <button data-p="300" onclick="pickPrice(300)">300</button>
         <button data-p="400" onclick="pickPrice(400)">400</button>
       </div>
     </div>
@@ -338,7 +378,7 @@ const Store=(()=>{let mem={},ok=false;try{localStorage.setItem('_t','1');localSt
   return{get:k=>{try{return ok?localStorage.getItem(k):(k in mem?mem[k]:null);}catch(e){return k in mem?mem[k]:null;}},
          set:(k,v)=>{try{ok?localStorage.setItem(k,v):mem[k]=v;}catch(e){mem[k]=v;}}};})();
 
-const LOG_KEY='oncall_log_v1', PAT_KEY='oncall_patient_v1';
+const LOG_KEY='oncall_log_v1', PAT_KEY='oncall_patient_v1', DOC_KEY='oncall_doctor_v1';
 
 /* ---------- procedure catalog ---------- */
 const PROCS=[
@@ -352,8 +392,11 @@ const PROCS=[
     {n:'Abdominal paracentesis', p:200, sub:'เจาะน้ำในช่องท้อง'},
     {n:'Lumbar puncture', p:200, sub:'เจาะน้ำไขสันหลัง'},
     {n:'Arthrocentesis', p:200, sub:'เจาะน้ำในข้อ'},
+    {n:'Ultrasound', p:300, sub:'อัลตราซาวด์ข้างเตียง'},
     {n:'ใส่ท่อช่วยหายใจ (ET tube)', p:400, sub:'Endotracheal intubation'},
     {n:'Central line', p:400, sub:'ใส่สายสวนหลอดเลือดดำส่วนกลาง'},
+    {n:'Double lumen', p:400, sub:'ใส่สายฟอกเลือด double lumen'},
+    {n:'Percutaneous chest drain', p:400, sub:'ใส่ท่อระบายทรวงอก'},
   ]},
   {g:'ดูแลผู้ป่วยวิกฤต ครั้งแรก (อัตรา 400)', items:[
     {title:'ช่วยฟื้นชีพ (CPR)', n:'การช่วยฟื้นชีพ', p:400},
@@ -376,6 +419,20 @@ const PROCS=[
 // flat list of all distinct procedures for dropdown
 const ALL_PROCS=[];PROCS.forEach(g=>g.items.forEach(i=>ALL_PROCS.push(i)));
 
+/* ---------- รายชื่อแพทย์ (เติมชื่อ + เลข ว. ที่นี่) ----------
+   ตัวอย่างรูปแบบ:  {name:'นพ.สมชาย ใจดี', lic:'12345'},
+*/
+const DOCTORS=[
+  {name:'พญ.ขนิษฐา พงษ์ศิริ', lic:'35608'},
+  {name:'นพ.จิระพงษ์ กอเทพวัลย์', lic:'25441'},
+  {name:'พญ.พิมภิมุข กลั่นเรืองแสง', lic:'24182'},
+  {name:'นพ.นันทวัฒน์ ยาวุฒิ', lic:'42183'},
+  {name:'นพ.บงการ จำนงประสาทพร', lic:'42034'},
+  {name:'พญ.ภาณุมาศ คำเขื่อน', lic:'44172'},
+  {name:'พญ.อมรรัตน์ คำสร้อย', lic:'48877'},
+  {name:'นพ.ณัฐภัทร ศรีวิชัย', lic:'64318'},
+];
+
 /* ---------- helpers ---------- */
 const THm=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const THd=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
@@ -397,12 +454,28 @@ function saveLog(){Store.set(LOG_KEY,JSON.stringify(LOG));}
 
 /* ---------- patient context ---------- */
 function loadPatient(){let p={};try{p=JSON.parse(Store.get(PAT_KEY)||'{}')}catch(e){}
-  pName.value=p.name||'';pHN.value=p.hn||'';pWard.value=p.ward||'';updatePatientHeader();}
-function savePatient(){Store.set(PAT_KEY,JSON.stringify({name:pName.value.trim(),hn:pHN.value.trim(),ward:pWard.value.trim()}));updatePatientHeader();}
-function clearPatient(){pName.value='';pHN.value='';pWard.value='';savePatient();pName.focus();toast('ล้างข้อมูลผู้ป่วยแล้ว');}
+  pName.value=p.name||'';pHN.value=p.hn||'';pWard.value=p.ward||'';pDx.value=p.dx||'';updatePatientHeader();}
+function savePatient(){Store.set(PAT_KEY,JSON.stringify({name:pName.value.trim(),hn:pHN.value.trim(),ward:pWard.value.trim(),dx:pDx.value.trim()}));updatePatientHeader();}
+function clearPatient(){pName.value='';pHN.value='';pWard.value='';pDx.value='';savePatient();pName.focus();toast('ล้างข้อมูลผู้ป่วยแล้ว');}
 function updatePatientHeader(){const n=pName.value.trim(),h=pHN.value.trim();
   patientHeader.textContent=(n||h)?((n||'(ไม่มีชื่อ)')+(h?' · HN '+h:'')):'ยังไม่ได้ตั้งผู้ป่วย';}
-['pName','pHN','pWard'].forEach(id=>document.getElementById(id).addEventListener('input',savePatient));
+['pName','pHN','pWard','pDx'].forEach(id=>document.getElementById(id).addEventListener('input',savePatient));
+
+/* ---------- doctor context ---------- */
+function docOptions(selVal){let o='<option value="">— ไม่ระบุ —</option>';
+  DOCTORS.forEach((d,i)=>{const v='d'+i;o+=`<option value="${v}"${selVal===v?' selected':''}>${d.name}${d.lic?' (ว.'+d.lic+')':''}</option>`;});
+  o+=`<option value="__c__"${selVal==='__c__'?' selected':''}>แพทย์อื่นๆ (ระบุ)…</option>`;return o;}
+function curDoctor(){ // returns {name,lic} for the selected on-duty doctor
+  const v=docSel.value;
+  if(v==='__c__')return{name:docName.value.trim(),lic:docLic.value.trim()};
+  if(v.startsWith('d')){const d=DOCTORS[+v.slice(1)];return d?{name:d.name,lic:d.lic||''}:{name:'',lic:''};}
+  return{name:'',lic:''};}
+function onDocSel(){docCustomWrap.style.display=docSel.value==='__c__'?'':'none';saveDoctor();}
+function saveDoctor(){const v=docSel.value;Store.set(DOC_KEY,JSON.stringify({sel:v,name:docName.value.trim(),lic:docLic.value.trim()}));}
+function loadDoctor(){let d={};try{d=JSON.parse(Store.get(DOC_KEY)||'{}')}catch(e){}
+  docSel.innerHTML=docOptions(d.sel||'');docName.value=d.name||'';docLic.value=d.lic||'';
+  docCustomWrap.style.display=docSel.value==='__c__'?'':'none';}
+['docName','docLic'].forEach(id=>document.getElementById(id).addEventListener('input',saveDoctor));
 
 /* ---------- clock ---------- */
 function tick(){const d=new Date();clkTime.textContent=pad(d.getHours())+':'+pad(d.getMinutes());
@@ -422,8 +495,10 @@ function renderProcs(){let html='';
 
 /* ---------- add entry ---------- */
 function quickAdd(name,price){
+  const doc=curDoctor();
   const e={id:Date.now()+'-'+Math.random().toString(36).slice(2,6),ts:Date.now(),
-    name:pName.value.trim(),hn:pHN.value.trim(),ward:pWard.value.trim(),proc:name,price:price};
+    name:pName.value.trim(),hn:pHN.value.trim(),ward:pWard.value.trim(),dx:pDx.value.trim(),
+    doctor:doc.name,lic:doc.lic,proc:name,price:price};
   LOG.push(e);saveLog();renderAll();
   toast('บันทึก '+name+' · '+price+' ฿');
 }
@@ -436,13 +511,26 @@ function onProcSel(){const v=mProcSel.value;
   if(v==='__custom__'){mCustomWrap.style.display='';}
   else{mCustomWrap.style.display='none';const f=ALL_PROCS.find(x=>x.n===v);if(f)pickPrice(f.p);}}
 function pickPrice(p){pickedPrice=p;[...mPrice.children].forEach(b=>b.classList.toggle('sel',+b.dataset.p===p));}
+function fillMDocSelect(){mDocSel.innerHTML=docOptions('');}
+function onMDocSel(){mDocCustomWrap.style.display=mDocSel.value==='__c__'?'':'none';}
+function setModalDoctor(name,lic){name=name||'';lic=lic||'';
+  const i=DOCTORS.findIndex(d=>d.name===name&&(d.lic||'')===lic);
+  if(i>=0){mDocSel.value='d'+i;mDocCustomWrap.style.display='none';}
+  else if(name||lic){mDocSel.value='__c__';mDocCustomWrap.style.display='';mDocName.value=name;mDocLic.value=lic;}
+  else{mDocSel.value='';mDocCustomWrap.style.display='none';mDocName.value='';mDocLic.value='';}}
+function getModalDoctor(){const v=mDocSel.value;
+  if(v==='__c__')return{name:mDocName.value.trim(),lic:mDocLic.value.trim()};
+  if(v.startsWith('d')){const d=DOCTORS[+v.slice(1)];return d?{name:d.name,lic:d.lic||''}:{name:'',lic:''};}
+  return{name:'',lic:''};}
 function openManual(){editingId=null;modalTitle.textContent='เพิ่มรายการ';
   fillProcSelect();mProcSel.value=ALL_PROCS[0].n;mCustomWrap.style.display='none';mCustom.value='';
   mDateTime.value=toLocalInput(Date.now());
-  mName.value=pName.value;mHN.value=pHN.value;mWard.value=pWard.value;
+  mName.value=pName.value;mHN.value=pHN.value;mWard.value=pWard.value;mDx.value=pDx.value;
+  fillMDocSelect();const cd=curDoctor();setModalDoctor(cd.name,cd.lic);
   pickPrice(ALL_PROCS[0].p);modalBg.classList.add('show');}
 function openEdit(id){const e=LOG.find(x=>x.id===id);if(!e)return;editingId=id;modalTitle.textContent='แก้ไขรายการ';
-  fillProcSelect();mDateTime.value=toLocalInput(e.ts);mName.value=e.name;mHN.value=e.hn;mWard.value=e.ward;
+  fillProcSelect();mDateTime.value=toLocalInput(e.ts);mName.value=e.name;mHN.value=e.hn;mWard.value=e.ward;mDx.value=e.dx||'';
+  fillMDocSelect();setModalDoctor(e.doctor,e.lic);
   if(ALL_PROCS.some(p=>p.n===e.proc)){mProcSel.value=e.proc;mCustomWrap.style.display='none';}
   else{mProcSel.value='__custom__';mCustomWrap.style.display='';mCustom.value=e.proc;}
   pickPrice(e.price);modalBg.classList.add('show');}
@@ -454,8 +542,10 @@ function saveModal(){
   if(!proc){toast('ใส่ชื่อหัตถการก่อน');return;}
   const ts=new Date(mDateTime.value).getTime();
   if(isNaN(ts)){toast('เวลาไม่ถูกต้อง');return;}
-  if(editingId){const e=LOG.find(x=>x.id===editingId);Object.assign(e,{ts,name:mName.value.trim(),hn:mHN.value.trim(),ward:mWard.value.trim(),proc,price:pickedPrice});toast('แก้ไขแล้ว');}
-  else{LOG.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,6),ts,name:mName.value.trim(),hn:mHN.value.trim(),ward:mWard.value.trim(),proc,price:pickedPrice});toast('เพิ่มรายการแล้ว');}
+  const doc=getModalDoctor();
+  const data={ts,name:mName.value.trim(),hn:mHN.value.trim(),ward:mWard.value.trim(),dx:mDx.value.trim(),doctor:doc.name,lic:doc.lic,proc,price:pickedPrice};
+  if(editingId){Object.assign(LOG.find(x=>x.id===editingId),data);toast('แก้ไขแล้ว');}
+  else{LOG.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,6),...data});toast('เพิ่มรายการแล้ว');}
   saveLog();closeModal();renderAll();}
 function delEntry(id){if(!confirm('ลบรายการนี้?'))return;LOG=LOG.filter(x=>x.id!==id);saveLog();renderAll();toast('ลบแล้ว');}
 
@@ -465,8 +555,9 @@ function entryHTML(e){const d=new Date(e.ts);const sh=shiftOf(d);
     <div class="tcol"><div class="time">${fmtTime(e.ts)}</div><div class="shift">${sh}</div></div>
     <div class="mid">
       <div class="pname">${e.name||'<span style="color:var(--muted);font-weight:600">(ไม่ระบุชื่อ)</span>'}</div>
-      <div class="meta">${e.hn?'HN '+e.hn:''}${e.hn&&e.ward?' · ':''}${e.ward||''}</div>
+      <div class="meta">${e.hn?'HN '+e.hn:''}${e.hn&&e.ward?' · ':''}${e.ward||''}${e.dx?(e.hn||e.ward?' · ':'')+'Dx: '+e.dx:''}</div>
       <div class="proc-n">${e.proc}</div>
+      ${e.doctor?`<div class="meta" style="margin-top:2px">แพทย์: ${e.doctor}${e.lic?' (ว.'+e.lic+')':''}</div>`:''}
     </div>
     <div class="rcol">
       <span class="price p${e.price}">${e.price} ฿</span>
@@ -524,11 +615,11 @@ let tT;function toast(m){toast_el=document.getElementById('toast');toast_el.text
 /* ---------- export CSV ---------- */
 function exportCSV(){
   if(!LOG.length){toast('ยังไม่มีข้อมูล');return;}
-  const rows=[['วันที่เวร','วันที่จริง','เวลา','เวร','ชื่อผู้ป่วย','HN','Ward','หัตถการ','ราคา(บาท)']];
+  const rows=[['วันที่เวร','วันที่จริง','เวลา','เวร','ชื่อผู้ป่วย','HN','Ward','วินิจฉัยโรค','หัตถการ','แพทย์ผู้ทำ','เลข ว.','ราคา(บาท)']];
   LOG.slice().sort((a,b)=>a.ts-b.ts).forEach(e=>{const d=new Date(e.ts);
     rows.push([dutyLabel(dutyKey(e.ts)),pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+(d.getFullYear()+543),
-      fmtTime(e.ts),shiftOf(d),e.name,e.hn,e.ward,e.proc,e.price]);});
-  rows.push([]);rows.push(['','','','','','','','รวม',LOG.reduce((s,e)=>s+e.price,0)]);
+      fmtTime(e.ts),shiftOf(d),e.name,e.hn,e.ward,e.dx||'',e.proc,e.doctor||'',e.lic||'',e.price]);});
+  rows.push([]);rows.push(['','','','','','','','','','','รวม',LOG.reduce((s,e)=>s+e.price,0)]);
   const csv='\uFEFF'+rows.map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='oncall_'+new Date().toISOString().slice(0,10)+'.csv';
@@ -540,9 +631,9 @@ function doPrint(){
   let html=`<h2>บันทึกหัตถการอยู่เวร</h2><div class="pmeta">พิมพ์เมื่อ ${new Date().toLocaleString('th-TH')} · รวม ${LOG.length} รายการ</div>`;
   groupByDuty(LOG.slice()).forEach(g=>{const s=g.items.reduce((a,e)=>a+e.price,0);
     html+=`<table><caption style="text-align:left;font-weight:700;margin-bottom:3px">${dutyLabel(g.key)}</caption>
-      <tr><th>เวลา</th><th>เวร</th><th>ชื่อผู้ป่วย</th><th>HN</th><th>Ward</th><th>หัตถการ</th><th class="num">ราคา</th></tr>`;
-    g.items.slice().sort((a,b)=>a.ts-b.ts).forEach(e=>{html+=`<tr><td>${fmtTime(e.ts)}</td><td>${shiftOf(new Date(e.ts))}</td><td>${e.name||'-'}</td><td>${e.hn||'-'}</td><td>${e.ward||'-'}</td><td>${e.proc}</td><td class="num">${e.price}</td></tr>`;});
-    html+=`<tr><td colspan="6" class="num"><b>รวมวันนี้</b></td><td class="num"><b>${fmtBaht(s)}</b></td></tr></table>`;});
+      <tr><th>เวลา</th><th>เวร</th><th>ชื่อผู้ป่วย</th><th>HN</th><th>Ward</th><th>วินิจฉัยโรค</th><th>หัตถการ</th><th>แพทย์ (ว.)</th><th class="num">ราคา</th></tr>`;
+    g.items.slice().sort((a,b)=>a.ts-b.ts).forEach(e=>{html+=`<tr><td>${fmtTime(e.ts)}</td><td>${shiftOf(new Date(e.ts))}</td><td>${e.name||'-'}</td><td>${e.hn||'-'}</td><td>${e.ward||'-'}</td><td>${e.dx||'-'}</td><td>${e.proc}</td><td>${e.doctor?e.doctor+(e.lic?' (ว.'+e.lic+')':''):'-'}</td><td class="num">${e.price}</td></tr>`;});
+    html+=`<tr><td colspan="8" class="num"><b>รวมวันนี้</b></td><td class="num"><b>${fmtBaht(s)}</b></td></tr></table>`;});
   html+=`<div class="gt">รวมทั้งหมด ${fmtBaht(LOG.reduce((s,e)=>s+e.price,0))} บาท</div>`;
   printArea.innerHTML=html;window.print();}
 
@@ -551,7 +642,7 @@ function wipeAll(){if(!confirm('ลบข้อมูลทั้งหมดถ
   if(!confirm('ยืนยันอีกครั้ง — ลบทุกรายการ'))return;LOG=[];saveLog();renderAll();toast('ล้างข้อมูลแล้ว');}
 
 /* ---------- init ---------- */
-renderProcs();loadPatient();renderAll();
+renderProcs();loadPatient();loadDoctor();renderAll();
 </script>
 </body>
 </html>
