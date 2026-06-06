@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d5c63">
+<title>บันทึกหัตถการอยู่เวร</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f5f6;
+    --card:#ffffff;
+    --ink:#1a2628;
+    --muted:#6b7b7e;
+    --line:#e2e8e9;
+    --brand:#0d5c63;
+    --brand-dark:#0a484e;
+    --c50:#2e7d32;   --c50bg:#e8f5e9;
+    --c100:#1565c0;  --c100bg:#e3f2fd;
+    --c200:#e58a00;  --c200bg:#fff4e2;
+    --c400:#c62828;  --c400bg:#fdecea;
+    --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 18px rgba(0,0,0,.05);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Sarabun',-apple-system,'Sukhumvit Set','Thonburi',sans-serif;
+    background:var(--bg); color:var(--ink);
+    font-size:16px; line-height:1.45;
+    padding-bottom:86px;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:0 14px}
+  header.app{
+    position:sticky;top:0;z-index:30;
+    background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+    color:#fff;padding:14px 0 16px;box-shadow:0 2px 12px rgba(0,0,0,.12)
+  }
+  header.app .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  header.app h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px}
+  header.app .sub{font-size:12px;opacity:.85;margin-top:2px}
+  .clock{font-variant-numeric:tabular-nums;text-align:right;font-size:13px;opacity:.95}
+  .clock .big{font-size:20px;font-weight:600;display:block;line-height:1.1}
+
+  section{margin-top:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card h2{font-size:14px;margin:0;padding:13px 15px;border-bottom:1px solid var(--line);color:var(--brand);font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .card .body{padding:13px 15px}
+  .label{font-size:12.5px;color:var(--muted);margin:0 0 4px;font-weight:600}
+
+  input,select,textarea{
+    width:100%;font-family:inherit;font-size:16px;color:var(--ink);
+    border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;background:#fff;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--brand)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row{margin-bottom:10px}
+  .row:last-child{margin-bottom:0}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;
+    padding:11px 14px;cursor:pointer;background:var(--brand);color:#fff;transition:.12s}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:#fff;color:var(--brand);border:1.5px solid var(--line)}
+  .btn.full{width:100%}
+  .btn.sm{padding:7px 11px;font-size:13.5px}
+  .btn.danger{background:var(--c400)}
+
+  .patient-chip{font-size:12px;background:rgba(255,255,255,.18);padding:3px 9px;border-radius:99px}
+
+  /* procedure buttons */
+  .proc-group{margin-bottom:14px}
+  .proc-group:last-child{margin-bottom:0}
+  .proc-group .gh{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
+  .price-tag{font-weight:800;font-size:12px;padding:2px 8px;border-radius:99px}
+  .pg50 .price-tag{color:var(--c50);background:var(--c50bg)}
+  .pg100 .price-tag{color:var(--c100);background:var(--c100bg)}
+  .pg200 .price-tag{color:var(--c200);background:var(--c200bg)}
+  .pg400 .price-tag{color:var(--c400);background:var(--c400bg)}
+  .proc-list{display:grid;gap:8px}
+  .proc{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    text-align:left;border-radius:12px;padding:12px 13px;cursor:pointer;border:1.5px solid;
+    font-family:inherit;font-size:15.5px;font-weight:600;background:#fff;transition:.12s}
+  .proc:active{transform:scale(.985)}
+  .proc .nm{display:flex;flex-direction:column}
+  .proc .nm small{font-weight:400;font-size:11.5px;color:var(--muted);margin-top:1px}
+  .proc .amt{font-weight:800;font-size:15px;white-space:nowrap}
+  .pg50 .proc{border-color:#bfe0c1;color:var(--c50)} .pg50 .proc .amt{color:var(--c50)}
+  .pg100 .proc{border-color:#bcd9f5;color:var(--c100)} .pg100 .proc .amt{color:var(--c100)}
+  .pg200 .proc{border-color:#f5dcab;color:var(--c200)} .pg200 .proc .amt{color:var(--c200)}
+  .pg400 .proc{border-color:#f3c2bd;color:var(--c400)} .pg400 .proc .amt{color:var(--c400)}
+
+  /* log list */
+  .daygroup{margin-bottom:14px}
+  .dayhead{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:8px 4px 8px;font-weight:700;font-size:14px;color:var(--brand)}
+  .dayhead .dsum{font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--line);padding:3px 10px;border-radius:99px;font-weight:700}
+  .entry{display:flex;align-items:flex-start;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+  .entry .tcol{text-align:center;min-width:52px}
+  .entry .time{font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
+  .entry .shift{font-size:10.5px;color:var(--muted);margin-top:1px;white-space:nowrap}
+  .entry .mid{flex:1;min-width:0}
+  .entry .pname{font-weight:700;font-size:15px;line-height:1.25}
+  .entry .meta{font-size:12px;color:var(--muted);margin-top:1px}
+  .entry .proc-n{font-size:13.5px;margin-top:4px}
+  .entry .rcol{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .entry .price{font-weight:800;font-size:15px;padding:2px 9px;border-radius:8px}
+  .p50{color:var(--c50);background:var(--c50bg)} .p100{color:var(--c100);background:var(--c100bg)}
+  .p200{color:var(--c200);background:var(--c200bg)} .p400{color:var(--c400);background:var(--c400bg)}
+  .iconbtn{border:none;background:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 4px}
+  .iconbtn:active{color:var(--c400)}
+
+  .empty{text-align:center;color:var(--muted);padding:34px 16px;font-size:14px}
+
+  /* summary */
+  .total-banner{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;border-radius:var(--radius);padding:18px;text-align:center;box-shadow:var(--shadow)}
+  .total-banner .n{font-size:34px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+  .total-banner .l{font-size:13px;opacity:.9}
+  .sumrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .sumrow:last-child{border-bottom:none}
+  .sumrow .ct{font-size:12px;color:var(--muted)}
+  .sumrow b{font-variant-numeric:tabular-nums}
+
+  /* bottom nav */
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:40;background:#fff;border-top:1px solid var(--line);
+    display:flex;box-shadow:0 -2px 14px rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom)}
+  nav.tabs button{flex:1;border:none;background:none;padding:9px 4px 10px;cursor:pointer;color:var(--muted);font-family:inherit;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+  nav.tabs button .ic{font-size:20px;line-height:1}
+  nav.tabs button.on{color:var(--brand)}
+
+  .view{display:none}
+  .view.on{display:block}
+
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:11px 18px;border-radius:99px;font-size:14px;font-weight:600;
+    opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 6px 20px rgba(0,0,0,.2);max-width:90vw;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(10,20,22,.5);z-index:70;display:none;align-items:flex-end;justify-content:center}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px 22px;max-height:92vh;overflow:auto;animation:up .2s ease}
+  @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .modal h3{margin:0 0 14px;font-size:17px;color:var(--brand)}
+  .pricepick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .pricepick button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px 0;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer}
+  .pricepick button.sel[data-p="50"]{border-color:var(--c50);background:var(--c50bg);color:var(--c50)}
+  .pricepick button.sel[data-p="100"]{border-color:var(--c100);background:var(--c100bg);color:var(--c100)}
+  .pricepick button.sel[data-p="200"]{border-color:var(--c200);background:var(--c200bg);color:var(--c200)}
+  .pricepick button.sel[data-p="400"]{border-color:var(--c400);background:var(--c400bg);color:var(--c400)}
+
+  .filterbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .filterbar select,.filterbar input{width:auto;flex:1;min-width:120px;padding:8px 10px;font-size:14px}
+
+  @media print{
+    body{padding:0;background:#fff;font-size:12px}
+    header.app,nav.tabs,#toast,.modal-bg,.noprint{display:none!important}
+    .view{display:none!important}
+    #printArea{display:block!important}
+  }
+  #printArea{display:none}
+  #printArea h2{font-size:16px;margin:0 0 2px}
+  #printArea .pmeta{font-size:11px;color:#555;margin-bottom:10px}
+  #printArea table{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:14px}
+  #printArea th,#printArea td{border:1px solid #999;padding:4px 6px;text-align:left}
+  #printArea th{background:#eee}
+  #printArea .num{text-align:right;font-variant-numeric:tabular-nums}
+  #printArea .gt{text-align:right;font-weight:800;font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="wrap">
+    <div>
+      <h1>บันทึกหัตถการอยู่เวร</h1>
+      <div class="sub" id="patientHeader">ยังไม่ได้ตั้งผู้ป่วย</div>
+    </div>
+    <div class="clock">
+      <span class="big" id="clkTime">--:--</span>
+      <span id="clkDate"></span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ บันทึก ============ -->
+<div class="view on" id="view-add">
+  <div class="wrap">
+
+    <section class="card">
+      <h2>ผู้ป่วยปัจจุบัน <button class="btn ghost sm" onclick="clearPatient()">ผู้ป่วยใหม่</button></h2>
+      <div class="body">
+        <div class="row">
+          <div class="label">ชื่อผู้ป่วย</div>
+          <input id="pName" placeholder="ชื่อ–สกุล" autocomplete="off">
+        </div>
+        <div class="grid2">
+          <div>
+            <div class="label">HN</div>
+            <input id="pHN" placeholder="HN" autocomplete="off" inputmode="numeric">
+          </div>
+          <div>
+            <div class="label">Ward</div>
+            <input id="pWard" placeholder="หอผู้ป่วย" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>เลือกหัตถการ (แตะเพื่อบันทึกทันที)</h2>
+      <div class="body" id="procPanel"></div>
+    </section>
+
+    <section style="margin-top:12px">
+      <button class="btn ghost full" onclick="openManual()">+ เพิ่มรายการเอง / ย้อนเวลา</button>
+    </section>
+
+    <section class="card" style="margin-top:14px">
+      <h2>รายการล่าสุดวันนี้ <span id="todayCount" class="patient-chip" style="background:var(--brand);color:#fff"></span></h2>
+      <div class="body" id="todayList"></div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ============ รายการทั้งหมด ============ -->
+<div class="view" id="view-log">
+  <div class="wrap">
+    <section class="card noprint">
+      <h2>ตัวกรอง</h2>
+      <div class="body">
+        <div class="filterbar">
+          <select id="fShift">
+            <option value="">ทุกเวร</option>
+            <option value="เช้า">เช้า (08–16)</option>
+            <option value="บ่าย">บ่าย (16–24)</option>
+            <option value="ดึก">ดึก (24–08)</option>
+          </select>
+          <input type="date" id="fDate">
+          <button class="btn ghost sm" onclick="clearFilter()">ล้าง</button>
+        </div>
+      </div>
+    </section>
+    <section id="fullLog" style="margin-top:14px"></section>
+  </div>
+</div>
+
+<!-- ============ สรุป ============ -->
+<div class="view" id="view-sum">
+  <div class="wrap">
+    <section>
+      <div class="total-banner">
+        <div class="n" id="grandTotal">0</div>
+        <div class="l">บาท · รวมทั้งหมด <span id="grandCount">0</span> รายการ</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>สรุปตามวันเวร</h2>
+      <div class="body" id="sumByDay"></div>
+    </section>
+
+    <section class="card">
+      <h2>สรุปตามหัตถการ</h2>
+      <div class="body" id="sumByProc"></div>
+    </section>
+
+    <section style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn full" onclick="exportCSV()">⬇ ส่งออก CSV (Excel)</button>
+      <button class="btn ghost full" onclick="doPrint()">🖨 พิมพ์</button>
+    </section>
+    <section style="margin-top:10px">
+      <button class="btn ghost full" style="color:var(--c400)" onclick="wipeAll()">ล้างข้อมูลทั้งหมด</button>
+    </section>
+    <p style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:14px">
+      ข้อมูลเก็บไว้ในเครื่องนี้เท่านั้น (localStorage) · ควรส่งออก CSV เก็บสำรองเป็นระยะ
+    </p>
+  </div>
+</div>
+
+<!-- bottom nav -->
+<nav class="tabs">
+  <button class="on" data-v="add" onclick="go('add')"><span class="ic">✚</span>บันทึก</button>
+  <button data-v="log" onclick="go('log')"><span class="ic">≣</span>รายการ</button>
+  <button data-v="sum" onclick="go('sum')"><span class="ic">∑</span>สรุป</button>
+</nav>
+
+<div id="toast"></div>
+
+<!-- edit/manual modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">เพิ่มรายการ</h3>
+    <div class="row">
+      <div class="label">วันที่ / เวลา</div>
+      <input type="datetime-local" id="mDateTime">
+    </div>
+    <div class="row">
+      <div class="label">ชื่อผู้ป่วย</div>
+      <input id="mName" placeholder="ชื่อ–สกุล">
+    </div>
+    <div class="grid2">
+      <div><div class="label">HN</div><input id="mHN" inputmode="numeric"></div>
+      <div><div class="label">Ward</div><input id="mWard"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div class="label">หัตถการ</div>
+      <select id="mProcSel" onchange="onProcSel()"></select>
+    </div>
+    <div class="row" id="mCustomWrap" style="display:none">
+      <div class="label">ชื่อหัตถการ (กำหนดเอง)</div>
+      <input id="mCustom" placeholder="พิมพ์ชื่อหัตถการ">
+    </div>
+    <div class="row">
+      <div class="label">ราคา (บาท)</div>
+      <div class="pricepick" id="mPrice">
+        <button data-p="50" onclick="pickPrice(50)">50</button>
+        <button data-p="100" onclick="pickPrice(100)">100</button>
+        <button data-p="200" onclick="pickPrice(200)">200</button>
+        <button data-p="400" onclick="pickPrice(400)">400</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn ghost full" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn full" onclick="saveModal()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+/* ---------- storage with in-memory fallback ---------- */
+const Store=(()=>{let mem={},ok=false;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');ok=true;}catch(e){ok=false;}
+  return{get:k=>{try{return ok?localStorage.getItem(k):(k in mem?mem[k]:null);}catch(e){return k in mem?mem[k]:null;}},
+         set:(k,v)=>{try{ok?localStorage.setItem(k,v):mem[k]=v;}catch(e){mem[k]=v;}}};})();
+
+const LOG_KEY='oncall_log_v1', PAT_KEY='oncall_patient_v1';
+
+/* ---------- procedure catalog ---------- */
+const PROCS=[
+  {g:'ตรวจ / รับปรึกษา', items:[
+    {n:'ตรวจผู้ป่วยในรายเก่า', p:50},
+    {n:'ตรวจผู้ป่วยในรายใหม่', p:100, sub:'กรณีร้องขอ/ขอคำปรึกษา · ผู้ป่วยรับใหม่'},
+    {n:'รับปรึกษาต่างแผนก', p:200, sub:'สำหรับการปรึกษาข้ามแผนก'},
+  ]},
+  {g:'หัตถการ (ทำเอง)', items:[
+    {n:'Thoracocentesis', p:200, sub:'เจาะน้ำในช่องเยื่อหุ้มปอด'},
+    {n:'Abdominal paracentesis', p:200, sub:'เจาะน้ำในช่องท้อง'},
+    {n:'Lumbar puncture', p:200, sub:'เจาะน้ำไขสันหลัง'},
+    {n:'Arthrocentesis', p:200, sub:'เจาะน้ำในข้อ'},
+    {n:'ใส่ท่อช่วยหายใจ (ET tube)', p:400, sub:'Endotracheal intubation'},
+    {n:'Central line', p:400, sub:'ใส่สายสวนหลอดเลือดดำส่วนกลาง'},
+  ]},
+  {g:'ดูแลผู้ป่วยวิกฤต ครั้งแรก (อัตรา 400)', items:[
+    {title:'ช่วยฟื้นชีพ (CPR)', n:'การช่วยฟื้นชีพ', p:400},
+    {title:'ผู้ป่วยหมดสติ', n:'การช่วยเหลือผู้ป่วยหมดสติ', p:400},
+    {title:'ผู้ป่วยช็อก', n:'การช่วยเหลือผู้ป่วยช็อก', p:400},
+    {title:'ภาวะหัวใจล้มเหลว', n:'การช่วยเหลือผู้ป่วยภาวะหัวใจล้มเหลว', p:400},
+    {title:'ภาวะชักวิกฤต', n:'การช่วยเหลือผู้ป่วยภาวะชักวิกฤต', p:400},
+    {title:'ภาวะจมน้ำ', n:'การช่วยเหลือผู้ป่วยภาวะจมน้ำ', p:400},
+    {title:'ฉุกเฉินทางจิตเวช', n:'การช่วยเหลือผู้ป่วยภาวะฉุกเฉินทางจิตเวช', p:400},
+    {title:'ไตวายเฉียบพลัน', n:'การช่วยเหลือผู้ป่วยภาวะไตวายเฉียบพลัน', p:400},
+    {title:'ตับวาย', n:'การช่วยเหลือผู้ป่วยภาวะตับวาย', p:400},
+    {title:'ความดันโลหิตสูงขั้นวิกฤต', n:'การช่วยเหลือผู้ป่วยภาวะความดันโลหิตสูงขั้นวิกฤต', p:400},
+    {title:'หัวใจล้มเหลว/หายใจไม่ทันมาก', n:'การช่วยเหลือผู้ป่วยภาวะหัวใจล้มเหลว และหายใจไม่ทันมาก', p:400},
+    {title:'ติดเชื้อรุนแรง/Sepsis/มาลาเรียฉุกเฉิน', n:'การช่วยเหลือผู้ป่วยภาวะติดเชื้อรุนแรงและติดเชื้อในกระแสโลหิต และมาลาเรียฉุกเฉิน', p:400},
+    {title:'หัวใจขาดเลือด/เต้นผิดปกติ', n:'การช่วยเหลือผู้ป่วยภาวะหัวใจขาดเลือด และหัวใจเต้นผิดปกติ', p:400},
+    {title:'แพ้รุนแรง (Anaphylaxis)', n:'การช่วยเหลือผู้ป่วยภาวะแพ้รุนแรง', p:400},
+    {title:'ตกเลือดในทางเดินอาหาร', n:'การช่วยเหลือผู้ป่วยภาวะตกเลือดในทางเดินอาหาร', p:400},
+  ]},
+];
+// flat list of all distinct procedures for dropdown
+const ALL_PROCS=[];PROCS.forEach(g=>g.items.forEach(i=>ALL_PROCS.push(i)));
+
+/* ---------- helpers ---------- */
+const THm=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const THd=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+function pad(n){return String(n).padStart(2,'0')}
+function shiftOf(d){const h=d.getHours();if(h>=8&&h<16)return'เช้า';if(h>=16)return'บ่าย';return'ดึก';}
+function shiftFull(s){return s==='เช้า'?'เช้า (08–16)':s==='บ่าย'?'บ่าย (16–24)':'ดึก (24–08)';}
+// duty date: ดึก (00:00–07:59) belongs to previous calendar day
+function dutyKey(ts){const d=new Date(ts);if(d.getHours()<8)d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function dutyLabel(key){const[y,m,dd]=key.split('-').map(Number);const d=new Date(y,m-1,dd);
+  return THd[d.getDay()]+' '+dd+' '+THm[m-1]+' '+(y+543);}
+function fmtTime(ts){const d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes());}
+function fmtBaht(n){return n.toLocaleString('th-TH');}
+function toLocalInput(ts){const d=new Date(ts);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());}
+
+/* ---------- state ---------- */
+let LOG=[];
+try{LOG=JSON.parse(Store.get(LOG_KEY)||'[]')}catch(e){LOG=[]}
+function saveLog(){Store.set(LOG_KEY,JSON.stringify(LOG));}
+
+/* ---------- patient context ---------- */
+function loadPatient(){let p={};try{p=JSON.parse(Store.get(PAT_KEY)||'{}')}catch(e){}
+  pName.value=p.name||'';pHN.value=p.hn||'';pWard.value=p.ward||'';updatePatientHeader();}
+function savePatient(){Store.set(PAT_KEY,JSON.stringify({name:pName.value.trim(),hn:pHN.value.trim(),ward:pWard.value.trim()}));updatePatientHeader();}
+function clearPatient(){pName.value='';pHN.value='';pWard.value='';savePatient();pName.focus();toast('ล้างข้อมูลผู้ป่วยแล้ว');}
+function updatePatientHeader(){const n=pName.value.trim(),h=pHN.value.trim();
+  patientHeader.textContent=(n||h)?((n||'(ไม่มีชื่อ)')+(h?' · HN '+h:'')):'ยังไม่ได้ตั้งผู้ป่วย';}
+['pName','pHN','pWard'].forEach(id=>document.getElementById(id).addEventListener('input',savePatient));
+
+/* ---------- clock ---------- */
+function tick(){const d=new Date();clkTime.textContent=pad(d.getHours())+':'+pad(d.getMinutes());
+  clkDate.textContent=THd[d.getDay()]+' '+d.getDate()+' '+THm[d.getMonth()]+' · '+shiftFull(shiftOf(d));}
+tick();setInterval(tick,1000*15);
+
+/* ---------- procedure panel ---------- */
+function renderProcs(){let html='';
+  PROCS.forEach(grp=>{
+    html+=`<div class="proc-group"><div class="gh">${grp.g}</div><div class="proc-list">`;
+    grp.items.forEach(it=>{const cls='pg'+it.p;const disp=it.title||it.n;const sub=it.sub||(it.title?it.n:'');
+      html+=`<div class="${cls}"><button class="proc" onclick="quickAdd('${it.n.replace(/'/g,"\\'")}',${it.p})">
+        <span class="nm">${disp}${sub?`<small>${sub}</small>`:''}</span>
+        <span class="amt">${it.p} ฿</span></button></div>`;});
+    html+='</div></div>';});
+  procPanel.innerHTML=html;}
+
+/* ---------- add entry ---------- */
+function quickAdd(name,price){
+  const e={id:Date.now()+'-'+Math.random().toString(36).slice(2,6),ts:Date.now(),
+    name:pName.value.trim(),hn:pHN.value.trim(),ward:pWard.value.trim(),proc:name,price:price};
+  LOG.push(e);saveLog();renderAll();
+  toast('บันทึก '+name+' · '+price+' ฿');
+}
+
+/* ---------- modal (manual add / edit) ---------- */
+let editingId=null,pickedPrice=null;
+function fillProcSelect(){let o='';ALL_PROCS.forEach(p=>{o+=`<option value="${p.n}">${p.n} (${p.p}฿)</option>`;});
+  o+='<option value="__custom__">อื่นๆ (กำหนดเอง)…</option>';mProcSel.innerHTML=o;}
+function onProcSel(){const v=mProcSel.value;
+  if(v==='__custom__'){mCustomWrap.style.display='';}
+  else{mCustomWrap.style.display='none';const f=ALL_PROCS.find(x=>x.n===v);if(f)pickPrice(f.p);}}
+function pickPrice(p){pickedPrice=p;[...mPrice.children].forEach(b=>b.classList.toggle('sel',+b.dataset.p===p));}
+function openManual(){editingId=null;modalTitle.textContent='เพิ่มรายการ';
+  fillProcSelect();mProcSel.value=ALL_PROCS[0].n;mCustomWrap.style.display='none';mCustom.value='';
+  mDateTime.value=toLocalInput(Date.now());
+  mName.value=pName.value;mHN.value=pHN.value;mWard.value=pWard.value;
+  pickPrice(ALL_PROCS[0].p);modalBg.classList.add('show');}
+function openEdit(id){const e=LOG.find(x=>x.id===id);if(!e)return;editingId=id;modalTitle.textContent='แก้ไขรายการ';
+  fillProcSelect();mDateTime.value=toLocalInput(e.ts);mName.value=e.name;mHN.value=e.hn;mWard.value=e.ward;
+  if(ALL_PROCS.some(p=>p.n===e.proc)){mProcSel.value=e.proc;mCustomWrap.style.display='none';}
+  else{mProcSel.value='__custom__';mCustomWrap.style.display='';mCustom.value=e.proc;}
+  pickPrice(e.price);modalBg.classList.add('show');}
+function closeModal(){modalBg.classList.remove('show');}
+modalBg.addEventListener('click',e=>{if(e.target===modalBg)closeModal();});
+function saveModal(){
+  if(!pickedPrice){toast('เลือกราคาก่อน');return;}
+  let proc=mProcSel.value==='__custom__'?mCustom.value.trim():mProcSel.value;
+  if(!proc){toast('ใส่ชื่อหัตถการก่อน');return;}
+  const ts=new Date(mDateTime.value).getTime();
+  if(isNaN(ts)){toast('เวลาไม่ถูกต้อง');return;}
+  if(editingId){const e=LOG.find(x=>x.id===editingId);Object.assign(e,{ts,name:mName.value.trim(),hn:mHN.value.trim(),ward:mWard.value.trim(),proc,price:pickedPrice});toast('แก้ไขแล้ว');}
+  else{LOG.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,6),ts,name:mName.value.trim(),hn:mHN.value.trim(),ward:mWard.value.trim(),proc,price:pickedPrice});toast('เพิ่มรายการแล้ว');}
+  saveLog();closeModal();renderAll();}
+function delEntry(id){if(!confirm('ลบรายการนี้?'))return;LOG=LOG.filter(x=>x.id!==id);saveLog();renderAll();toast('ลบแล้ว');}
+
+/* ---------- rendering ---------- */
+function entryHTML(e){const d=new Date(e.ts);const sh=shiftOf(d);
+  return `<div class="entry">
+    <div class="tcol"><div class="time">${fmtTime(e.ts)}</div><div class="shift">${sh}</div></div>
+    <div class="mid">
+      <div class="pname">${e.name||'<span style="color:var(--muted);font-weight:600">(ไม่ระบุชื่อ)</span>'}</div>
+      <div class="meta">${e.hn?'HN '+e.hn:''}${e.hn&&e.ward?' · ':''}${e.ward||''}</div>
+      <div class="proc-n">${e.proc}</div>
+    </div>
+    <div class="rcol">
+      <span class="price p${e.price}">${e.price} ฿</span>
+      <div><button class="iconbtn" onclick="openEdit('${e.id}')">แก้</button>
+      <button class="iconbtn" onclick="delEntry('${e.id}')">ลบ</button></div>
+    </div></div>`;}
+
+function renderToday(){const tk=dutyKey(Date.now());
+  const list=LOG.filter(e=>dutyKey(e.ts)===tk).sort((a,b)=>b.ts-a.ts);
+  todayCount.textContent=list.length+' รายการ · '+fmtBaht(list.reduce((s,e)=>s+e.price,0))+' ฿';
+  todayList.innerHTML=list.length?list.map(entryHTML).join(''):'<div class="empty">ยังไม่มีรายการในเวรนี้</div>';}
+
+function groupByDuty(items){const m={};items.forEach(e=>{const k=dutyKey(e.ts);(m[k]=m[k]||[]).push(e);});
+  return Object.keys(m).sort().reverse().map(k=>({key:k,items:m[k].sort((a,b)=>b.ts-a.ts)}));}
+
+function renderFullLog(){
+  let items=LOG.slice();
+  const fs=fShift.value,fd=fDate.value;
+  if(fs)items=items.filter(e=>shiftOf(new Date(e.ts))===fs);
+  if(fd)items=items.filter(e=>dutyKey(e.ts)===fd);
+  if(!items.length){fullLog.innerHTML='<div class="card"><div class="empty">ไม่มีรายการ</div></div>';return;}
+  let html='';groupByDuty(items).forEach(g=>{
+    const sum=g.items.reduce((s,e)=>s+e.price,0);
+    html+=`<div class="daygroup"><div class="dayhead"><span>${dutyLabel(g.key)}</span>
+      <span class="dsum">${g.items.length} ราย · ${fmtBaht(sum)} ฿</span></div>`;
+    html+=g.items.map(entryHTML).join('');html+='</div>';});
+  fullLog.innerHTML=html;}
+
+function clearFilter(){fShift.value='';fDate.value='';renderFullLog();}
+fShift.addEventListener('change',renderFullLog);fDate.addEventListener('change',renderFullLog);
+
+function renderSummary(){
+  const total=LOG.reduce((s,e)=>s+e.price,0);
+  grandTotal.textContent=fmtBaht(total);grandCount.textContent=LOG.length;
+  // by duty day
+  const byDay=groupByDuty(LOG.slice());
+  sumByDay.innerHTML=byDay.length?byDay.map(g=>{const s=g.items.reduce((a,e)=>a+e.price,0);
+    return `<div class="sumrow"><span>${dutyLabel(g.key)}<div class="ct">${g.items.length} รายการ</div></span><b>${fmtBaht(s)} ฿</b></div>`;}).join(''):'<div class="empty">ยังไม่มีข้อมูล</div>';
+  // by procedure
+  const m={};LOG.forEach(e=>{const k=e.proc;m[k]=m[k]||{c:0,s:0,p:e.price};m[k].c++;m[k].s+=e.price;});
+  const arr=Object.keys(m).map(k=>({n:k,...m[k]})).sort((a,b)=>b.s-a.s);
+  sumByProc.innerHTML=arr.length?arr.map(x=>`<div class="sumrow"><span>${x.n}<div class="ct">${x.c} ครั้ง × ${x.p} ฿</div></span><b>${fmtBaht(x.s)} ฿</b></div>`).join(''):'<div class="empty">ยังไม่มีข้อมูล</div>';}
+
+function renderAll(){renderToday();renderFullLog();renderSummary();}
+
+/* ---------- nav ---------- */
+function go(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+  document.getElementById('view-'+v).classList.add('on');
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  window.scrollTo(0,0);}
+
+/* ---------- toast ---------- */
+let tT;function toast(m){toast_el=document.getElementById('toast');toast_el.textContent=m;toast_el.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>toast_el.classList.remove('show'),1700);}
+
+/* ---------- export CSV ---------- */
+function exportCSV(){
+  if(!LOG.length){toast('ยังไม่มีข้อมูล');return;}
+  const rows=[['วันที่เวร','วันที่จริง','เวลา','เวร','ชื่อผู้ป่วย','HN','Ward','หัตถการ','ราคา(บาท)']];
+  LOG.slice().sort((a,b)=>a.ts-b.ts).forEach(e=>{const d=new Date(e.ts);
+    rows.push([dutyLabel(dutyKey(e.ts)),pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+(d.getFullYear()+543),
+      fmtTime(e.ts),shiftOf(d),e.name,e.hn,e.ward,e.proc,e.price]);});
+  rows.push([]);rows.push(['','','','','','','','รวม',LOG.reduce((s,e)=>s+e.price,0)]);
+  const csv='\uFEFF'+rows.map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='oncall_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('ส่งออก CSV แล้ว');}
+
+/* ---------- print ---------- */
+function doPrint(){
+  if(!LOG.length){toast('ยังไม่มีข้อมูล');return;}
+  let html=`<h2>บันทึกหัตถการอยู่เวร</h2><div class="pmeta">พิมพ์เมื่อ ${new Date().toLocaleString('th-TH')} · รวม ${LOG.length} รายการ</div>`;
+  groupByDuty(LOG.slice()).forEach(g=>{const s=g.items.reduce((a,e)=>a+e.price,0);
+    html+=`<table><caption style="text-align:left;font-weight:700;margin-bottom:3px">${dutyLabel(g.key)}</caption>
+      <tr><th>เวลา</th><th>เวร</th><th>ชื่อผู้ป่วย</th><th>HN</th><th>Ward</th><th>หัตถการ</th><th class="num">ราคา</th></tr>`;
+    g.items.slice().sort((a,b)=>a.ts-b.ts).forEach(e=>{html+=`<tr><td>${fmtTime(e.ts)}</td><td>${shiftOf(new Date(e.ts))}</td><td>${e.name||'-'}</td><td>${e.hn||'-'}</td><td>${e.ward||'-'}</td><td>${e.proc}</td><td class="num">${e.price}</td></tr>`;});
+    html+=`<tr><td colspan="6" class="num"><b>รวมวันนี้</b></td><td class="num"><b>${fmtBaht(s)}</b></td></tr></table>`;});
+  html+=`<div class="gt">รวมทั้งหมด ${fmtBaht(LOG.reduce((s,e)=>s+e.price,0))} บาท</div>`;
+  printArea.innerHTML=html;window.print();}
+
+/* ---------- wipe ---------- */
+function wipeAll(){if(!confirm('ลบข้อมูลทั้งหมดถาวร? ควรส่งออก CSV ก่อน'))return;
+  if(!confirm('ยืนยันอีกครั้ง — ลบทุกรายการ'))return;LOG=[];saveLog();renderAll();toast('ล้างข้อมูลแล้ว');}
+
+/* ---------- init ---------- */
+renderProcs();loadPatient();renderAll();
+</script>
+</body>
+</html>
